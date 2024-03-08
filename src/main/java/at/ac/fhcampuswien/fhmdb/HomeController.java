@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class HomeController implements Initializable {
     @FXML
@@ -23,10 +24,10 @@ public class HomeController implements Initializable {
     public TextField searchField;
 
     @FXML
-    public JFXListView movieListView;
+    public JFXListView<Movie> movieListView;
 
     @FXML
-    public JFXComboBox genreComboBox;
+    public JFXComboBox<String> genreComboBox;
 
     @FXML
     public JFXButton sortBtn;
@@ -43,23 +44,54 @@ public class HomeController implements Initializable {
         movieListView.setItems(observableMovies);   // set data of observable list to list view
         movieListView.setCellFactory(movieListView -> new MovieCell()); // use custom cell factory to display data
 
-        // TODO add genre filter items with genreComboBox.getItems().addAll(...)
+        // Populate genre filter items
+        List<String> genres = allMovies.stream()
+                .flatMap(movie -> movie.getGenres().stream())
+                .distinct()
+                .collect(Collectors.toList());
+        genreComboBox.getItems().addAll(genres);
         genreComboBox.setPromptText("Filter by Genre");
 
-        // TODO add event handlers to buttons and call the regarding methods
-        // either set event handlers in the fxml file (onAction) or add them here
+        // Set event handlers to buttons
+        searchBtn.setOnAction(actionEvent -> filterBySearch());
+        sortBtn.setOnAction(actionEvent -> sortMovies());
+        genreComboBox.setOnAction(actionEvent -> filterByGenre());
+    }
 
-        // Sort button example:
-        sortBtn.setOnAction(actionEvent -> {
-            if(sortBtn.getText().equals("Sort (asc)")) {
-                // TODO sort observableMovies ascending
-                sortBtn.setText("Sort (desc)");
-            } else {
-                // TODO sort observableMovies descending
-                sortBtn.setText("Sort (asc)");
-            }
-        });
+    // Filter movies by search query
+    private void filterBySearch() {
+        String query = searchField.getText().toLowerCase().trim();
+        if (query.isEmpty()) {
+            // If search query is empty, show all movies
+            observableMovies.setAll(allMovies);
+        } else {
+            // Filter movies based on search query in title or description
+            observableMovies.setAll(allMovies.stream()
+                    .filter(movie -> movie.getTitle().toLowerCase().contains(query) || movie.getDescription().toLowerCase().contains(query))
+                    .collect(Collectors.toList()));
+        }
+    }
 
+    // Filter movies by genre
+    private void filterByGenre() {
+        String selectedGenre = genreComboBox.getValue();
+        if (selectedGenre == null || selectedGenre.isEmpty()) {
+            observableMovies.setAll(allMovies);
+        } else {
+            observableMovies.setAll(allMovies.stream()
+                    .filter(movie -> movie.getGenres().contains(selectedGenre))
+                    .collect(Collectors.toList()));
+        }
+    }
 
+    // Sort movies
+    private void sortMovies() {
+        if (sortBtn.getText().equals("Sort (asc)")) {
+            observableMovies.sort((movie1, movie2) -> movie1.getTitle().compareToIgnoreCase(movie2.getTitle()));
+            sortBtn.setText("Sort (desc)");
+        } else {
+            observableMovies.sort((movie1, movie2) -> movie2.getTitle().compareToIgnoreCase(movie1.getTitle()));
+            sortBtn.setText("Sort (asc)");
+        }
     }
 }

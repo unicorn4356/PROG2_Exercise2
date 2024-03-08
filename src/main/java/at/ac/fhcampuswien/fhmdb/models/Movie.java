@@ -6,11 +6,12 @@ import java.util.List;
 public class Movie {
     private String title;
     private String description;
-    // TODO add more properties here
+    private List<String> genres;
 
-    public Movie(String title, String description) {
+    public Movie(String title, String description, List<String> genres) {
         this.title = title;
         this.description = description;
+        this.genres = genres;
     }
 
     public String getTitle() {
@@ -21,10 +22,27 @@ public class Movie {
         return description;
     }
 
-    public static List<Movie> initializeMovies(){
+    public List<String> getGenres() {
+        return genres;
+    }
+
+    public static List<Movie> initializeMovies() {
         List<Movie> movies = new ArrayList<>();
-        // TODO add some dummy data here
+        // Adding some dummy data
+        movies.add(new Movie("The Shawshank Redemption", "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.", List.of("Drama")));
+        movies.add(new Movie("The Godfather", "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.", List.of("Crime", "Drama")));
+        movies.add(new Movie("The Dark Knight", "When the menace known as The Joker emerges from his mysterious past, he wreaks havoc and chaos on the people of Gotham.", List.of("Action", "Crime", "Drama")));
+        movies.add(new Movie("Schindler's List", "In German-occupied Poland during World War II, industrialist Oskar Schindler gradually becomes concerned for his Jewish workforce after witnessing their persecution by the Nazis.", List.of("Biography", "Drama", "History")));
+        movies.add(new Movie("Inception", "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.", List.of("Action", "Adventure", "Sci-Fi")));
+        movies.add(new Movie("Pulp Fiction", "The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.", List.of("Crime", "Drama")));
+        movies.add(new Movie("Forrest Gump", "The presidencies of Kennedy and Johnson, the Vietnam War, the Watergate scandal and other historical events unfold from the perspective of an Alabama man with an IQ of 75, whose only desire is to be reunited with his childhood sweetheart.", List.of("Drama", "Romance")));
+        movies.add(new Movie("The Matrix", "A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.", List.of("Action", "Sci-Fi")));
+        movies.add(new Movie("Fight Club", "An insomniac office worker and a devil-may-care soap maker form an underground fight club that evolves into much more.", List.of("Drama")));
+        movies.add(new Movie("Goodfellas", "The story of Henry Hill and his life in the mob, covering his relationship with his wife Karen Hill and his mob partners Jimmy Conway and Tommy DeVito in the Italian-American crime syndicate.", List.of("Biography", "Crime", "Drama")));
+        // Add more dummy data as needed
 
         return movies;
     }
+
 }
+
