@@ -60,22 +60,22 @@ public class HomeController implements Initializable {
 
     // Filter movies by search query
     // Filter movies by search query and genre
+    // Filter movies to show only the one that matches exactly with the search query
+    // Filter movies by search query
     private void filterBySearch() {
-        String query = searchField.getText().toLowerCase().trim();
-        String selectedGenre = genreComboBox.getValue();
+        String query = searchField.getText().trim().toLowerCase();
 
-        if (query.isEmpty() && (selectedGenre == null || selectedGenre.isEmpty())) {
-            // If both query and genre are empty, show all movies
-            observableMovies.setAll(allMovies);
-        } else {
-            // Filter movies based on search query and/or genre
-            observableMovies.setAll(allMovies.stream()
-                    .filter(movie ->
-                            (query.isEmpty() || movie.getTitle().toLowerCase().contains(query) || movie.getDescription().toLowerCase().contains(query)) &&
-                                    (selectedGenre == null || selectedGenre.isEmpty() || movie.getGenres().contains(selectedGenre)))
-                    .collect(Collectors.toList()));
-        }
+        // Filter movies based on search query in title or description
+        observableMovies.setAll(allMovies.stream()
+                .filter(movie -> {
+                    String title = movie.getTitle().toLowerCase();
+                    String description = movie.getDescription().toLowerCase();
+                    return title.contains(query) || description.contains(query);
+                })
+                .collect(Collectors.toList()));
     }
+
+
 
 
 
@@ -83,13 +83,18 @@ public class HomeController implements Initializable {
     private void filterByGenre() {
         String selectedGenre = genreComboBox.getValue();
         if (selectedGenre == null || selectedGenre.isEmpty()) {
+            // If no genre is selected, show all movies
             observableMovies.setAll(allMovies);
         } else {
+            // Filter movies to show only those that belong to the selected genre
             observableMovies.setAll(allMovies.stream()
                     .filter(movie -> movie.getGenres().contains(selectedGenre))
                     .collect(Collectors.toList()));
         }
     }
+
+
+
 
     // Sort movies
     private void sortMovies() {
