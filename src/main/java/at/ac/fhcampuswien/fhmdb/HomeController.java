@@ -59,18 +59,25 @@ public class HomeController implements Initializable {
     }
 
     // Filter movies by search query
+    // Filter movies by search query and genre
     private void filterBySearch() {
         String query = searchField.getText().toLowerCase().trim();
-        if (query.isEmpty()) {
-            // If search query is empty, show all movies
+        String selectedGenre = genreComboBox.getValue();
+
+        if (query.isEmpty() && (selectedGenre == null || selectedGenre.isEmpty())) {
+            // If both query and genre are empty, show all movies
             observableMovies.setAll(allMovies);
         } else {
-            // Filter movies based on search query in title or description
+            // Filter movies based on search query and/or genre
             observableMovies.setAll(allMovies.stream()
-                    .filter(movie -> movie.getTitle().toLowerCase().contains(query) || movie.getDescription().toLowerCase().contains(query))
+                    .filter(movie ->
+                            (query.isEmpty() || movie.getTitle().toLowerCase().contains(query) || movie.getDescription().toLowerCase().contains(query)) &&
+                                    (selectedGenre == null || selectedGenre.isEmpty() || movie.getGenres().contains(selectedGenre)))
                     .collect(Collectors.toList()));
         }
     }
+
+
 
     // Filter movies by genre
     private void filterByGenre() {
