@@ -2,6 +2,7 @@ package at.ac.fhcampuswien.fhmdb;
 
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import at.ac.fhcampuswien.fhmdb.ui.MovieCell;
+import static at.ac.fhcampuswien.fhmdb.API.MovieAPI.getAllMovies;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
@@ -14,10 +15,17 @@ import javafx.scene.control.TextField;
 
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class HomeController implements Initializable {
     @FXML
     public JFXButton sortBtn;
+
+    @FXML
+    public JFXButton resetBtn;
+
+    @FXML
+    public JFXButton searchBtn;
 
     @FXML
     public TextField searchField;
@@ -29,7 +37,10 @@ public class HomeController implements Initializable {
     public JFXComboBox genreComboBox;
 
     @FXML
-    public JFXButton searchBtn;
+    public JFXComboBox releaseYearComboBox;
+
+    @FXML
+    public JFXComboBox ratingComboBox;
 
     public List<Movie> allFilms;
 
@@ -76,6 +87,18 @@ public class HomeController implements Initializable {
         genreComboBox.getItems().add("No filter");  // add "no filter" to the combobox
         genreComboBox.getItems().addAll(genres);    // add all genres to the combobox
         genreComboBox.setPromptText("Filter by Genre");
+
+        releaseYearComboBox.setPromptText("Filter by Release Year");
+        Integer[] releaseYears = new Integer[78];
+        for (int i = 0; i < 78; i++) {
+            releaseYears[i] = 2023 - i;
+        }
+        //releaseYearComboBox.getItems().add("No filter");
+        releaseYearComboBox.getItems().addAll(releaseYears);
+
+        ratingComboBox.setPromptText("Filter by rating");
+        Double[] rating = new Double[]{1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 7.00, 8.00, 9.00, 10.00};
+        ratingComboBox.getItems().addAll(rating);
     }
 
     private void printMovieListViewContent() {
@@ -86,9 +109,62 @@ public class HomeController implements Initializable {
         }
     }
 
-    public List<Movie> filterBySearchTerm(List<Movie> movies, String term) {
-        if (term == null || term.isEmpty()) return movies;
+    public void searchButtonClicked(ActionEvent actionEvent) {
+        System.out.println("Search button clicked");
+        String searchTerm = searchField.getText().trim().toLowerCase();
+        System.out.println(searchTerm);
+        Object selectedGenre = genreComboBox.getSelectionModel().getSelectedItem();
+        System.out.println(selectedGenre);
+        String releaseYear = "";
+        String rating = "";
+        if (releaseYearComboBox.getSelectionModel().getSelectedItem() != null)
+            releaseYear = releaseYearComboBox.getSelectionModel().getSelectedItem().toString();
+        if (ratingComboBox.getSelectionModel().getSelectedItem() != null)
+            rating = ratingComboBox.getSelectionModel().getSelectedItem().toString();
+        applyFilters(searchTerm, selectedGenre, releaseYear, rating);
+    }
 
+    public void applyFilters(String searchTerm, Object selectedGenre, String releaseYear, String rating) {
+        List<Movie> filteredMovies;
+        if (searchTerm.isEmpty() && selectedGenre.equals("No filter") && releaseYear.equals("Filter by Release Year") && rating.equals("Filter by rating")) {
+            filteredMovies = getAllMovies(null, null, null, null);
+        } else {
+            String search;
+            if (searchTerm.isEmpty()) {
+                search = null;
+            } else {
+                search = searchTerm;
+            }
+
+            Object thisGenre;
+            if (selectedGenre != null && selectedGenre.equals("No filter")) {
+                selectedGenre = null;
+            } else {
+                thisGenre = selectedGenre;
+            }
+
+            String selectedReleaseYear;
+            if (releaseYear.equals("Filter by Release Year")) {
+                selectedReleaseYear = null;
+            } else {
+                //selectedReleaseYear = Integer.parseInt(releaseYear);
+                selectedReleaseYear = releaseYear;
+            }
+
+            String selectedRating;
+            if (rating.equals("Filter by rating")) {
+                selectedRating = null;
+            } else {
+                //selectedRating = Double.parseDouble(rating);
+                selectedRating = rating;
+            }
+
+            filteredMovies = getAllMovies(search, selectedGenre, selectedReleaseYear, selectedRating);
+        }
+    }
+
+
+    public List<Movie> filterBySearchTerm(List<Movie> movies, String term) {
         return movies.stream()
                 .filter(Objects::nonNull)
                 .filter(movie ->
@@ -99,54 +175,73 @@ public class HomeController implements Initializable {
     }
 
     public List<Movie> filterByFilmGenre(List<Movie> movies, Object genre) {
-        if (genre == null) return movies;
-
         return movies.stream()
                 .filter(Objects::nonNull)
                 .filter(movie -> movie.getGenres().contains(genre))
                 .toList();
     }
 
-    public void applyFilters(String searchTerm, Object selectedGenre) {
-        List<Movie> filteredMovies = allFilms;
-
-        if (!searchTerm.isEmpty()) {
-            filteredMovies = filterBySearchTerm(filteredMovies, searchTerm);
-            System.out.println("Filtered movies after search filter was set: " + filteredMovies);
-        }
-
-        if (selectedGenre != null && !selectedGenre.toString().equals("No filter")) {
-            filteredMovies = filterByFilmGenre(filteredMovies, selectedGenre);
-            System.out.println("Filtered movies after genre filter was set: " + filteredMovies);
-        }
-        displayedMovies.clear();
-        displayedMovies.addAll(filteredMovies);
-
-        System.out.println("Displayed movies after re-adding: " + displayedMovies.toString());
-
-        // Aktualisiere die ListView, um die Änderungen anzuzeigen
-        //movieListView.getItems().clear();
-        //movieListView.getItems().addAll(displayedMovies);
+    /*private List<Movie> filterByRating(List<Movie> movies, String year) {
+        return movies.stream()
+                .filter(Objects::nonNull)
+                .filter(movie -> movie.getReleaseYear().contains(year))
+                .toList();
     }
 
+    private List<Movie> filterByReleaseYear(List<Movie> movies, String rating) {
+        return movies.stream()
+                .filter(Objects::nonNull)
+                .filter(movie -> movie.getRating().contains(rating))
+                .toList();
+    }*/
 
-
-    public void searchButtonClicked(ActionEvent actionEvent) {
-        System.out.println("Search button clicked");
-        String searchTerm = searchField.getText().trim().toLowerCase();
-        System.out.println(searchTerm);
-        Object selectedGenre = genreComboBox.getSelectionModel().getSelectedItem();
-        System.out.println(selectedGenre);
-        applyFilters(searchTerm, selectedGenre);
-    }
 
     private void sortMovies() {
-        if (sortBtn.getText().equals("Sort (asc)")) {
+        if (sortBtn.getText().equals("Sort")) {
             displayedMovies.sort((movie1, movie2) -> movie1.getTitle().compareToIgnoreCase(movie2.getTitle()));
-            sortBtn.setText("Sort (desc)");
+            sortBtn.setText("Sort");
         } else {
             displayedMovies.sort((movie1, movie2) -> movie2.getTitle().compareToIgnoreCase(movie1.getTitle()));
-            sortBtn.setText("Sort (asc)");
+            sortBtn.setText("Sort");
         }
     }
+
+    public void resetBtnClicked(ActionEvent actionEvent) {
+        genreComboBox.setPromptText("Filter by Genre");
+        releaseYearComboBox.getSelectionModel().clearSelection();
+        searchField.clear();
+        ratingComboBox.getSelectionModel().clearSelection();
+
+    }
+
+    public long countMoviesFrom(List<Movie> movies, String director) {
+        return movies.stream()
+                .filter(movie -> movie.getDirectors().contains(director))
+                .count();
+    }
+
+    public int getLongestMovieTitle(List<Movie> movies) {
+        return movies.stream()
+                .map(Movie::getTitle)
+                .mapToInt(String::length)
+                .max()
+                .orElse(0);
+    }
+
+    public List<Movie> getMoviesBetweenYears(List<Movie> movies, int startYear, int endyear) {
+        return movies.stream()
+                .filter(movie -> movie.getReleaseYear() >= startYear && movie.getReleaseYear() <= endyear)
+                .collect(Collectors.toList());
+    }
+
+    public String getMostPopularActor(List<Movie> movies) {
+        return movies.stream()
+                .flatMap(movie -> movie.getMainCast().stream())
+                .collect(Collectors.groupingBy(String::toLowerCase, Collectors.counting()))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("");
+    }
+
 }
