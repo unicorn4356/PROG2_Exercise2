@@ -14,7 +14,7 @@ public class MovieAPI {
     private static final OkHttpClient client = new OkHttpClient();
     private static final Gson gson = new Gson();
 
-    private static String buildURL(String query, Object genre, String releaseYear, String ratingFrom) {
+    static String buildURL(String query, Object genre, String releaseYear, String ratingFrom) {
         StringBuilder url = new StringBuilder(URL);
         if (query != null || genre != null || releaseYear != null || ratingFrom != null) {
             url.append("?query=").append(query != null ? query : "").append(DELIMITER);
