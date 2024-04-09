@@ -92,5 +92,7 @@ class HomeControllerTest {
         assertEquals("Drama", observableMovies.get(1).getGenres().get(0));
     }
 
+
+
     // Add more test cases for different scenarios as mentioned in the previous response.
 }
