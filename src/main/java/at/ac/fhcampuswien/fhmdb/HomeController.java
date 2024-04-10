@@ -83,7 +83,7 @@ public class HomeController implements Initializable {
         // Konvertieren der Menge zurück in ein Array, um doppelte Worte zu entfernen
         Object[] genres = uniqueGenresSet.toArray();
 
-        genreComboBox.getItems().add((Object) "No filter");
+        //genreComboBox.getItems().add((Object) "No filter");
         genreComboBox.getItems().addAll(genres);    // add all genres to the combobox
         genreComboBox.setPromptText("Filter by Genre");
 
@@ -125,10 +125,10 @@ public class HomeController implements Initializable {
 
     public void applyFilters(String searchTerm, Object selectedGenre, String releaseYear, String rating) {
         List<Movie> filteredMovies;
-        if (searchTerm.isEmpty() && releaseYear.equals("Filter by Release Year") && rating.equals("Filter by rating") && selectedGenre == null || selectedGenre.equals("No filter")) {
+        /*if (searchTerm.isEmpty() && releaseYear.equals("Filter by Release Year") && rating.equals("Filter by rating") && selectedGenre == null || selectedGenre.equals("No filter")) {
             filteredMovies = getAllMovies(null, null, null, null);
-        } else {
-            String search;
+        } else {*/
+        String search;
             if (searchTerm.isEmpty()) {
                 search = null;
             } else {
@@ -136,7 +136,7 @@ public class HomeController implements Initializable {
             }
 
             Object thisGenre;
-            if (selectedGenre == null || selectedGenre.equals("No filter")) {
+            if (selectedGenre == null) {
                 thisGenre = null;
             } else {
                 thisGenre = selectedGenre;
@@ -164,7 +164,6 @@ public class HomeController implements Initializable {
             System.out.println("Displayed movies after re-adding: " + displayedMovies.toString());
 
 
-        }
     }
 
     private void sortMovies() {

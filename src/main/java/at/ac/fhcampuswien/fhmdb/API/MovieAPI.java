@@ -18,10 +18,7 @@ public class MovieAPI {
         StringBuilder url = new StringBuilder(URL);
         if (query != null || genre != null || releaseYear != null || ratingFrom != null) {
             url.append("?query=").append(query != null ? query : "").append(DELIMITER);
-            if (genre != null) {
-                // Hier wandeln wir den Genre-Enum in einen String um und fügen ihn zur URL hinzu
-                url.append("genre=").append(genre.toString()).append(DELIMITER);
-            }
+            url.append("genre=").append(genre != null ? genre.toString() : "").append(DELIMITER);
             url.append("releaseYear=").append(releaseYear != null ? releaseYear : "").append(DELIMITER)
                     .append("ratingFrom=").append(ratingFrom != null ? ratingFrom : "");
         }
@@ -56,6 +53,7 @@ public class MovieAPI {
 
 
     public static List<Movie> getAllMovies() {
+
         return getAllMovies(null, null, null, null);
     }
 }

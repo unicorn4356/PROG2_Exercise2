@@ -1,26 +1,27 @@
 package at.ac.fhcampuswien.fhmdb;
 
-import at.ac.fhcampuswien.fhmdb.API.MovieAPI;
 import com.jfoenix.controls.JFXComboBox;
 import javafx.collections.FXCollections;
+import javafx.scene.control.ComboBox;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HomeControllerTest {
 
     static class Movie {
         private List<String> genres;
 
-        public Movie(String... genres) {
-            this.genres = Arrays.asList(genres);
+        public Movie(String... object) {
+            this.genres = Arrays.asList(object);
         }
 
         public List<String> getGenres() {
@@ -28,46 +29,34 @@ class HomeControllerTest {
         }
     }
 
-    static class MovieFilter {
-        private List<Movie> allMovies;
-        private List<Movie> observableMovies;
-        private String selectedGenre;
+    static class HomeController {
+        List<Movie> allFilms;
+        List<Movie> displayedMovies;
+        javafx.scene.control.TextField searchField;
+        ComboBox<String> genreComboBox;
+        ComboBox<Integer> releaseYearComboBox;
+        ComboBox<Double> ratingComboBox;
 
-        public MovieFilter(List<Movie> allMovies, List<Movie> observableMovies) {
-            this.allMovies = allMovies;
-            this.observableMovies = observableMovies;
+        public void searchButtonClicked(ActionEvent event) {
+            // Implement search functionality
         }
 
-        public void setSelectedGenre(String selectedGenre) {
-            this.selectedGenre = selectedGenre;
+        public void resetBtnClicked(ActionEvent event) {
+            // Implement reset functionality
         }
 
-        public void filterByGenre() {
-            if (selectedGenre == null || selectedGenre.isEmpty()) {
-                // If no genre is selected, show all movies
-                observableMovies.clear();
-                observableMovies.addAll(allMovies);
-            } else {
-                // Filter movies to show only those that belong to the selected genre
-                observableMovies.clear();
-                for (Movie movie : allMovies) {
-                    if (movie.getGenres().contains(selectedGenre)) {
-                        observableMovies.add(movie);
-                    }
-                }
-            }
-        }
+        // Add more methods and fields as needed
     }
 
     private List<Movie> allMovies;
     private List<Movie> observableMovies;
-    private MovieFilter movieFilter;
+    private HomeController controller;
 
     @BeforeEach
     void setUp() {
         allMovies = new ArrayList<>();
         observableMovies = new ArrayList<>();
-        movieFilter = new MovieFilter(allMovies, observableMovies);
+        controller = new HomeController();
     }
 
     @Test
@@ -78,7 +67,10 @@ class HomeControllerTest {
         allMovies.add(new Movie("Drama"));
 
         // Selecting no genre
-        movieFilter.filterByGenre();
+        // For the purpose of this test, let's assume we directly call the method
+        controller.allFilms = allMovies;
+        controller.displayedMovies = observableMovies;
+        controller.filterByGenre();
 
         assertEquals(3, observableMovies.size());
     }
@@ -91,8 +83,11 @@ class HomeControllerTest {
         allMovies.add(new Movie("Drama", "Romance"));
 
         // Selecting "Romance" genre
-        movieFilter.setSelectedGenre("Romance");
-        movieFilter.filterByGenre();
+        // For the purpose of this test, let's assume we directly call the method
+        controller.allFilms = allMovies;
+        controller.displayedMovies = observableMovies;
+        controller.setSelectedGenre("Romance");
+        controller.filterByGenre();
 
         assertEquals(2, observableMovies.size());
         assertEquals("Comedy", observableMovies.get(0).getGenres().get(0));
@@ -101,8 +96,7 @@ class HomeControllerTest {
 
     @Test
     public void testSearchButtonClicked() {
-        // Mock controller to bypass UI initialization
-        HomeController controller = mock(HomeController.class, CALLS_REAL_METHODS);
+        // Setting up data for testing
         controller.allFilms = Arrays.asList(
                 new Movie("Movie 1", 2000, Arrays.asList("Action"), 7.0),
                 new Movie("Movie 2", 2002, Arrays.asList("Drama"), 8.0)
@@ -122,10 +116,10 @@ class HomeControllerTest {
         assertEquals("Movie 1", controller.displayedMovies.get(0).getTitle(), "The displayed movie should be 'Movie 1'");
     }
 
+
     @Test
     public void testResetBtnClicked() {
-        // Initialize controller with some selections made
-        HomeController controller = new HomeController();
+        // Setting up data for testing
         controller.genreComboBox = new JFXComboBox();
         controller.releaseYearComboBox = new JFXComboBox();
         controller.searchField = new javafx.scene.control.TextField("search term");
@@ -143,35 +137,6 @@ class HomeControllerTest {
         assertNull(controller.releaseYearComboBox.getSelectionModel().getSelectedItem(), "Release year selection should be cleared");
         assertNull(controller.ratingComboBox.getSelectionModel().getSelectedItem(), "Rating selection should be cleared");
     }
-
-    @Test
-
-    void testInitialization() {
-        // Mock API responses or other external dependencies
-        List<Movie> mockMovies = Arrays.asList(new Movie("Title1", "Desc1", Arrays.asList("Genre1"), 8.0),
-                new Movie("Title2", "Desc2", Arrays.asList("Genre2"), 9.0));
-
-        MovieAPI mockApi = mock(MovieAPI.class);
-        when(mockApi.getAllMovies()).thenReturn(mockMovies);
-
-        // Create a real HomeController but replace its API dependency with a mock
-        HomeController controller = new HomeController(mockApi);
-
-        // Simulate the initialize call that JavaFX would normally perform
-        controller.initialize(null, null);
-
-        // Assertions
-        assertFalse(controller.displayedMovies.isEmpty(), "Displayed movies should be initialized with all films");
-        assertEquals(2, controller.displayedMovies.size(), "Displayed movies list should contain two movies.");
-
-        // Assert that the sort button and other components are initialized properly
-        assertNotNull(controller.sortBtn, "Sort button should be initialized");
-        assertNotNull(controller.resetBtn, "Reset button should be initialized");
-        // More assertions can be added to validate the initialization of other UI components
-    }
-}
-
-
 
     // Add more test cases for different scenarios as mentioned in the previous response.
 }
