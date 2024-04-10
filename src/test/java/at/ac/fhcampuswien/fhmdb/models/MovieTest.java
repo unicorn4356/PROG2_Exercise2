@@ -21,7 +21,7 @@ public class MovieTest {
     @Test
     void testGetGenres() {
         Movie movie = new Movie("The Dark Knight", "When the menace known as The Joker emerges from his mysterious past, he wreaks havoc and chaos on the people of Gotham.", List.of("Action", "Crime", "Drama"));
-        List<String> genres = movie.getGenres();
+        List<Object> genres = movie.getGenres();
         assertEquals(3, genres.size());
         assertEquals("Action", genres.get(0));
         assertEquals("Crime", genres.get(1));

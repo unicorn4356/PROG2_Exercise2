@@ -1,5 +1,6 @@
 package at.ac.fhcampuswien.fhmdb;
 
+import at.ac.fhcampuswien.fhmdb.API.MovieAPI;
 import com.jfoenix.controls.JFXComboBox;
 import javafx.collections.FXCollections;
 import org.junit.jupiter.api.BeforeEach;
@@ -107,7 +108,7 @@ class HomeControllerTest {
                 new Movie("Movie 2", 2002, Arrays.asList("Drama"), 8.0)
         );
         controller.displayedMovies = FXCollections.observableArrayList(controller.allFilms);
-        controller.searchField = new TextField();
+        controller.searchField = new javafx.scene.control.TextField();
         controller.genreComboBox = new JFXComboBox();
         controller.releaseYearComboBox = new JFXComboBox();
         controller.ratingComboBox = new JFXComboBox();
@@ -144,21 +145,31 @@ class HomeControllerTest {
     }
 
     @Test
-    public void testInitialization() {
-        // Mock dependencies
-        HomeController controller = mock(HomeController.class, CALLS_REAL_METHODS);
-        controller.allFilms = mock(List.class);
-        controller.displayedMovies = FXCollections.observableArrayList();
-        doReturn(Arrays.asList(new Movie(), new Movie())).when(controller).getAllMovies();
 
-        // Invoke initialization
+    void testInitialization() {
+        // Mock API responses or other external dependencies
+        List<Movie> mockMovies = Arrays.asList(new Movie("Title1", "Desc1", Arrays.asList("Genre1"), 8.0),
+                new Movie("Title2", "Desc2", Arrays.asList("Genre2"), 9.0));
+
+        MovieAPI mockApi = mock(MovieAPI.class);
+        when(mockApi.getAllMovies()).thenReturn(mockMovies);
+
+        // Create a real HomeController but replace its API dependency with a mock
+        HomeController controller = new HomeController(mockApi);
+
+        // Simulate the initialize call that JavaFX would normally perform
         controller.initialize(null, null);
 
-        // Verify internal state
+        // Assertions
         assertFalse(controller.displayedMovies.isEmpty(), "Displayed movies should be initialized with all films");
+        assertEquals(2, controller.displayedMovies.size(), "Displayed movies list should contain two movies.");
+
+        // Assert that the sort button and other components are initialized properly
         assertNotNull(controller.sortBtn, "Sort button should be initialized");
-        // Add assertions for other UI components as necessary
+        assertNotNull(controller.resetBtn, "Reset button should be initialized");
+        // More assertions can be added to validate the initialization of other UI components
     }
+}
 
 
 
